@@ -328,7 +328,7 @@ export default function Home({ widgets }: Props) {
 
         <Row className="rowBalance mt-4">
           <Col xs={12} sm={12} md={12} lg={12} xl={12}>
-            <div className="d-flex flex-wrap justify-content-center gap-3">
+            <div className="d-flex flex-wrap justify-content-between gap-3">
               {loading ? (
                 <div>Carregando...</div>
               ) : (
@@ -338,7 +338,7 @@ export default function Home({ widgets }: Props) {
                     moeda={<span>{getCurrencyIcon(cotacao.moeda)}</span>}
                     nome={cotacao.nome}
                     cotacao={cotacao.cotacao}
-                    variacao={cotacao.variacao}                  
+                    variacao={cotacao.variacao}
                   />
                 ))
               )}
@@ -347,8 +347,6 @@ export default function Home({ widgets }: Props) {
         </Row>
 
         <Graficos />
-
-
       </Col>
       <Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <Row>
