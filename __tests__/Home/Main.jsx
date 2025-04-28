@@ -28,6 +28,7 @@ const mockTheme = {
   },
 };
 
+// TESTES DO COMPONENTE MAIN
 describe('Main Component', () => {
   beforeEach(() => {
     render(
