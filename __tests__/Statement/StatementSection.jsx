@@ -2,7 +2,7 @@ import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
 import StatementSection from '../../@core/components/Statement/StatementSection';
 
-describe('Page', () => {
+describe('Statement Section', () => {
   it('renders a level 6 heading', () => {
     render(
         <StatementSection
