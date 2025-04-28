@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import Statement from '../../@core/components/Statement';
+import Statement from '../../../@core/components/Statement';
 
 describe('Statement', () => {
   it('renders a level 6 heading', () => {

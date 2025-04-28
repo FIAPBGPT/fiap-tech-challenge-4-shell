@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
-import Toast from '../@core/components/Toast';
+import Toast from '../../@core/components/Toast';
 
 describe('Statement Item', () => {
     it('renders a level 6 heading', () => {

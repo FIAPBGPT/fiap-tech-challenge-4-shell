@@ -1,7 +1,7 @@
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { render, screen } from '@testing-library/react';
-import CardSaldo from '../../@core/components/ui/CardSaldo/CardSaldo';
+import CardSaldo from '../../../@core/components/ui/CardSaldo/CardSaldo';
 
 describe('CardSaldo', () => {
   const now = new Date('2025-04-25T06:00:00.000Z');

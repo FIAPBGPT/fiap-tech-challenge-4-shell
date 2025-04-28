@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom'
 import { render, screen } from '@testing-library/react'
-import StatementItem from '../../@core/components/Statement/StatementItem';
+import StatementItem from '../../../@core/components/Statement/StatementItem';
 
 describe('Statement Item', () => {
   it('renders a level 6 heading', () => {
