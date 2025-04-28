@@ -7,7 +7,6 @@ import ToastContainer from "./ToastContainer";
 import ToastIconWrapper from "./ToastIconWrapper";
 import ToastProps from "../../props/toast";
 
-
 const ToastTCF: React.FC<ToastProps> = ({
   icon = "info",
   message,
