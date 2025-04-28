@@ -5,7 +5,7 @@ export const CardSaldo = styled.div`
   width: 100%;
   height: 402px;
   border-radius: 8px;
-  background-color: ${(props) => props.theme.themeColor.primary};
+  background-color: ${(props) => props.theme.themeColor?.primary};
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   margin: 0 auto;
   padding: 24px;
@@ -30,31 +30,30 @@ export const CardSaldo = styled.div`
 `;
 
 export const TitleCard = styled.h2`
-  font-size: ${(props) => props.theme.font_size.fontsizemdlarge};
+  font-size: ${(props) => props.theme.font_size?.fontsizemdlarge};
   font-weight: 600;
-  color: ${(props) => props.theme.themeColor.white};
-  font-family: ${({ theme }) => theme.themeFonts.fontFamily};
+  color: ${(props) => props.theme.themeColor?.white};
+  font-family: ${({ theme }) => theme.themeFonts?.fontFamily};
 
   @media (max-width: 768px) {
     font-size: ${(props) =>
-      props.theme.font_size.fontsizlarge}; /* Reduz a fonte em telas menores */
+      props.theme.font_size?.fontsizlarge}; /* Reduz a fonte em telas menores */
   }
 
   @media (max-width: 576px) {
     font-size: ${(props) =>
-      props.theme.font_size
-        .fontsizesmall}; /* Ajuste adicional em telas pequenas */
+      props.theme.font_size?.fontsizesmall}; /* Ajuste adicional em telas pequenas */
   }
 `;
 
 export const DateInfoCard = styled.p`
-  font-size: ${(props) => props.theme.font_size.fontsizesmall};
-  font-family: ${({ theme }) => theme.themeFonts.fontFamily};
-  color: ${(props) => props.theme.themeColor.white};
+  font-size: ${(props) => props.theme.font_size?.fontsizesmall};
+  font-family: ${({ theme }) => theme.themeFonts?.fontFamily};
+  color: ${(props) => props.theme.themeColor?.white};
   margin-top: 4px;
 
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.font_size.fontsizesmall};
+    font-size: ${(props) => props.theme.font_size?.fontsizesmall};
   }
 `;
 
@@ -86,7 +85,7 @@ export const BalanceRow = styled.div`
   color: #333;
 
   svg {
-    color: ${(props) => props.theme.themeColor.secondary};
+    color: ${(props) => props.theme.themeColor?.secondary};
     cursor: pointer;
   }
 `;
@@ -95,7 +94,7 @@ export const DividerBalance = styled.hr`
   width: 100%;
   height: 5px;
   border: none;
-  border-top: 1px solid ${(props) => props.theme.themeColor.secondary};
+  border-top: 1px solid ${(props) => props.theme.themeColor?.secondary};
   margin: 6px 0;
   opacity: 0.5;
 
@@ -105,28 +104,28 @@ export const DividerBalance = styled.hr`
 `;
 
 export const TitleBalance = styled.p`
-  color: ${(props) => props.theme.themeColor.white};
+  color: ${(props) => props.theme.themeColor?.white};
   font-weight: 600;
   margin: 0 !important;
-  font-family: ${({ theme }) => theme.themeFonts.fontFamily};
-  font-size: ${(props) => props.theme.font_size.fontsizelarge};
+  font-family: ${({ theme }) => theme.themeFonts?.fontFamily};
+  font-size: ${(props) => props.theme.font_size?.fontsizelarge};
 `;
 
 export const SubTitleBalance = styled.p`
-  font-family: ${({ theme }) => theme.themeFonts.fontFamily};
-  font-size: ${(props) => props.theme.font_size.fontsizemedium};
-  color: ${(props) => props.theme.themeColor.white};
+  font-family: ${({ theme }) => theme.themeFonts?.fontFamily};
+  font-size: ${(props) => props.theme.font_size?.fontsizemedium};
+  color: ${(props) => props.theme.themeColor?.white};
   font-weight: 400;
 
   @media (max-width: 768px) {
-    font-size: ${(props) => props.theme.font_size.fontsizesmall};
+    font-size: ${(props) => props.theme.font_size?.fontsizesmall};
   }
 `;
 
 export const ValueBalance = styled.p`
-  font-family: ${({ theme }) => theme.themeFonts.fontFamily};
-  font-size: ${(props) => props.theme.font_size.fontsizemdlarge};
-  color: ${(props) => props.theme.themeColor.white};
+  font-family: ${({ theme }) => theme.themeFonts?.fontFamily};
+  font-size: ${(props) => props.theme.font_size?.fontsizemdlarge};
+  color: ${(props) => props.theme.themeColor?.white};
 `;
 
 export const ButtonIcon = styled.button`
