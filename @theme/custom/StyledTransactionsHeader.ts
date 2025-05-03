@@ -2,7 +2,6 @@ import styled from "styled-components";
 
 const StyledHeader = styled.div`
   background-color: ${(props) => props.theme.themeColor.primary};
-  color: themed.themeColor.secondary;
   display: "flex";
   justifycontent: "center";
 
