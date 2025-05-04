@@ -348,7 +348,9 @@ export default function Home({ widgets }: Props) {
       <Col xs={12} sm={12} md={8} lg={8} xl={8}>
         <Suspense
           fallback={
-            <div className="loading-placeholder">Loading main section...</div>
+            <div className="loading-placeholder" style={{ paddingLeft: 10 }}>
+              Loading main section...
+            </div>
           }
         >
           <Row className="rowBalance">
@@ -397,6 +399,7 @@ export default function Home({ widgets }: Props) {
 
         <Graficos />
       </Col>
+
       <Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <Row>
           <Col xs={12} sm={12} md={12} lg={12}>
