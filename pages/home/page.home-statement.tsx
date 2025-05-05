@@ -5,7 +5,6 @@
 
 import { useEffect, useReducer } from "react";
 import Statement from "../../@core/components/Statement";
-import { listTransactions } from "../../@core/services/transaction_service";
 import useAxiosAuth from "@/@core/hooks/useAxiosAuth";
 import { useSession } from "next-auth/react";
 import { jwtDecode } from "jwt-decode";
