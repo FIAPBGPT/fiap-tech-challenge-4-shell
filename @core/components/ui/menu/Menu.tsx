@@ -6,12 +6,9 @@ import AsideMenu from './AsideMenu';
 
 
 export default function Menu() {
-
     const pathname = usePathname();
-
     const { width } = useWindowSize();
 
-    
     const FixedMenu = () => {
         return (width > 360 && <AsideMenu pathname={pathname} />)
     }
