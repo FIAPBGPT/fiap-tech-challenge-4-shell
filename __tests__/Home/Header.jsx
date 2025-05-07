@@ -80,22 +80,22 @@ describe("Header component", () => {
             </SessionProvider>
         );
 
-        // Clica no botão "Já Tenho Conta"
+  
         const loginButton = screen.getByText(/Já Tenho Conta/i);
         fireEvent.click(loginButton);
 
         console.log("screen", screen.debug());
-        // Espera o modal aparecer
+
         await waitFor(() => {
-            // Agora espera que o texto "Preencha os campos" esteja na tela
+
             console.log("screen", screen.debug());
             expect(screen.getByText(/Login/i)).toBeInTheDocument();
         });
     });
 
     it("deve tentar cadastrar usuário ao enviar formulário de cadastro", async () => {
-        // Simula uma tela maior para garantir que o botão "Abrir Minha Conta" esteja visível
-        global.innerWidth = 1024;  // Defina a largura da tela para garantir que o botão seja exibido
+
+        global.innerWidth = 1024; 
 
         render(
             <SessionProvider session={null}>
@@ -105,38 +105,15 @@ describe("Header component", () => {
             </SessionProvider>
         );
 
-        // Clica no botão "Abrir Minha Conta"
+
         const cadastroButton = screen.getByRole("button", { name: "Abrir Minha Conta" });
         fireEvent.click(cadastroButton);
 
-        // Espera a imagem de cadastro ser exibida no modal
+
         await waitFor(() => {
             expect(screen.getByAltText("Ilustração Cadastro")).toBeInTheDocument();
         });
 
-        // // Preenche os campos do formulário
-        // fireEvent.change(screen.getByPlaceholderText("Digite seu nome completo"), {
-        //     target: { value: "Usuário Teste" },
-        // });
-        // fireEvent.change(screen.getByPlaceholderText("Digite seu e-mail"), {
-        //     target: { value: "teste@teste.com" },
-        // });
-        // fireEvent.change(screen.getByPlaceholderText("Digite sua senha"), {
-        //     target: { value: "123456" },
-        // });
-
-        // // Marca a opção de concordar com os termos
-        // fireEvent.click(screen.getByLabelText(/Li e estou ciente/i));
-
-        // // Simula o envio do formulário
-        // const submitButton = screen.getByRole("button", { name: /Criar Conta/i });
-        // fireEvent.click(submitButton);
-
-        // // Espera o toast de "Usuário Cadastrado" ser exibido após o envio
-        // await waitFor(() => {
-        //     // Verifica se o toast de sucesso foi exibido
-        //     expect(screen.getByText(/Usuário Cadastrado com Sucesso!/i)).toBeInTheDocument();
-        // });
     });
 
 });
