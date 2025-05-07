@@ -39,10 +39,10 @@ export default function RootLayout() {
         ...session,
         user: {
           result: {
-            ...session.user.result,
+            ...session.user,
             widgets:
               Object.keys(widgetsChosen).length === 0
-                ? session.user.result.widgets
+                ? (session.user as any).widgets
                 : widgetsChosen,
           },
         },
@@ -64,11 +64,11 @@ export default function RootLayout() {
       dispatch(
         returnUserData({
           ...user,
-          token: session.user.result.token,
-          username: session.user.result.username,
+          token: (session.user as any).token,
+          username: (session.user as any).username,
           widgets:
             Object.keys(widgetsChosen).length === 0
-              ? session.user.result.widgets
+              ? (session.user as any).widgets
               : widgetsChosen,
         })
       );

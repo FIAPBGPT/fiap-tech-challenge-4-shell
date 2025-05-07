@@ -9,6 +9,8 @@ import {
   FormLabelStrong,
   PStrong,
   FormCheckCustom,
+  UlValidationInfo,
+  DivValidationInfo,
 } from "../../../@theme/custom/FormStyles";
 
 const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
@@ -18,11 +20,43 @@ const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
     name: yup.string().required("Por favor, digite o seu nome!"),
     email: yup
       .string()
-      .email("Por favor, digite um e-mail válido!")
-      .required("Por favor, digite seu e-mail"),
-    password: yup.string().required(),
+      .required("Por favor, digite seu e-mail")
+      .matches(
+        /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+        "Digite um endereço de e-mail válido"
+      )
+      .email("E-mail inválido"),
+    password: yup
+      .string()
+      .required("Digite uma senha")
+      .test(
+        "senha-forte",
+        "A senha deve conter no mínimo 8 caracteres, incluindo letra maiúscula, minúscula, número e símbolo.",
+        (value) =>
+          !!value &&
+          /[A-Z]/.test(value) &&
+          /[a-z]/.test(value) &&
+          /[0-9]/.test(value) &&
+          /[\W_]/.test(value) &&
+          value.length >= 8
+      ),
     terms: yup.bool().required().oneOf([true], "Os Termos devem ser aceitos."),
   });
+
+  const strongPassword = (password: string): boolean => {
+    return (
+      /[A-Z]/.test(password) &&
+      /[a-z]/.test(password) &&
+      /[0-9]/.test(password) &&
+      /[\W_]/.test(password) &&
+      password.length >= 8
+    );
+  };
+
+  const validEmail = (email: string): boolean => {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+  };
+
   return (
     <>
       <Formik
@@ -102,6 +136,20 @@ const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
                     isValid={touched.email && !errors.email}
                   />
                 </Form.Group>
+
+                {values.email && (
+                  <DivValidationInfo
+                    style={{
+                      color: /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email)
+                        ? "green"
+                        : "red",
+                    }}
+                  >
+                    {/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(values.email)
+                      ? "✅ E-mail válido"
+                      : "❌ E-mail inválido"}
+                  </DivValidationInfo>
+                )}
               </Col>
               <Col xs={12} sm={12} md={12} lg={12}>
                 <Form.Group
@@ -118,6 +166,49 @@ const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
                     isValid={touched.password && !errors.password}
                   />
                 </Form.Group>
+                {values.password && (
+                  <UlValidationInfo>
+                    <li
+                      style={{
+                        color: /[A-Z]/.test(values.password) ? "green" : "red",
+                      }}
+                    >
+                      {/[A-Z]/.test(values.password) ? "✅" : "❌"} Letra
+                      maiúscula
+                    </li>
+                    <li
+                      style={{
+                        color: /[a-z]/.test(values.password) ? "green" : "red",
+                      }}
+                    >
+                      {/[a-z]/.test(values.password) ? "✅" : "❌"} Letra
+                      minúscula
+                    </li>
+                    <li
+                      style={{
+                        color: /[0-9]/.test(values.password) ? "green" : "red",
+                      }}
+                    >
+                      {/[0-9]/.test(values.password) ? "✅" : "❌"} Número
+                    </li>
+                    <li
+                      style={{
+                        color: /[\W_]/.test(values.password) ? "green" : "red",
+                      }}
+                    >
+                      {/[\W_]/.test(values.password) ? "✅" : "❌"} Símbolo (ex:
+                      @ # $ % !)
+                    </li>
+                    <li
+                      style={{
+                        color: values.password.length >= 8 ? "green" : "red",
+                      }}
+                    >
+                      {values.password.length >= 8 ? "✅" : "❌"} Mínimo de 8
+                      caracteres
+                    </li>
+                  </UlValidationInfo>
+                )}
               </Col>
             </Row>
             <Row>
@@ -141,7 +232,14 @@ const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
                 <ButtonTCF
                   variant={"orange"}
                   label={"Criar Conta"}
-                  disabled={!(dirty && isValid)}
+                  disabled={
+                    !(
+                      dirty &&
+                      isValid &&
+                      strongPassword(values.password) &&
+                      validEmail(values.email)
+                    )
+                  }
                   size={"sm"}
                   type="submit"
                 />

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -19,7 +20,6 @@ import { jwtDecode } from "jwt-decode";
 import useAxiosAuth from "@/@core/hooks/useAxiosAuth";
 import transactionsService from "@/@core/services/api-node/transactions.service";
 import router from "next/router";
-import useTransactionsService from "@/@core/services/api-node/transactions.service";
 import ModalUploadTransacoes from "./modalUpload";
 import { useSelector } from "react-redux";
 import dynamic from "next/dynamic";
@@ -29,7 +29,6 @@ interface CustomJwtPayload {
   iat: number;
   exp: number;
 }
-
 
 export default function Transacoes() {
   const [transactions, setTransactions] = useState<any>([]);
@@ -66,30 +65,31 @@ export default function Transacoes() {
     console.error("Token não encontrado na sessão.");
   }
 
-
-  // @ts-ignore
-  const TransacoesGraficos = dynamic<{ token: string; clientId: string }>(() => import('remoteNextApp/transacoesGrafico'), {
-    ssr: false,
-    loading: () => (
-      <Row>
-        <Col
-          xs={12}
-          sm={12}
-          md={12}
-          lg={12}
-          className=" d-flex justify-content-center"
-        >
-          <Spinner
-            animation="border"
-            role="status"
-            variant="secondary"
-            size="sm"
-          />
-        </Col>
-      </Row>
-    ),
-  });
-
+  const TransacoesGraficos = dynamic<{ token: string; clientId: string }>(
+    // @ts-ignore
+    () => import("remoteNextApp/transacoesGrafico"),
+    {
+      ssr: false,
+      loading: () => (
+        <Row>
+          <Col
+            xs={12}
+            sm={12}
+            md={12}
+            lg={12}
+            className=" d-flex justify-content-center"
+          >
+            <Spinner
+              animation="border"
+              role="status"
+              variant="secondary"
+              size="sm"
+            />
+          </Col>
+        </Row>
+      ),
+    }
+  );
 
   const handleDeleteClose = () => {
     setIsModalOpen(false);
@@ -97,9 +97,10 @@ export default function Transacoes() {
 
   const handleModalUploadOpen = () => {
     setIsModalUploadOpen(true);
-  }
+  };
   const handleModalClose = () => {
     setIsModalUploadOpen(false);
+    setLoading(false);
   };
 
   const handleCloseDeleteSubmit = async () => {
@@ -160,7 +161,7 @@ export default function Transacoes() {
         setIsModalTransacaoOpen(state);
         break;
     }
-  };  
+  };
 
   const handleShowDelete = (itemClicked: any) => {
     setIsModalOpen(true);
@@ -173,6 +174,7 @@ export default function Transacoes() {
       if (user.token === "") return;
       const token: string = user.token;
       const decodedUser: any = jwtDecode(token);
+      console.log(user);
       switch (typeTransaction) {
         case "add":
           const formattedFormDataAdd: any = {
@@ -358,12 +360,12 @@ export default function Transacoes() {
     } catch (error: any) {
       console.error(error);
     }
-  }, [user]);
+  }, [user, handleTransacaoForm]);
 
-   const handleDownload = () => {
-    const link = document.createElement('a');
+  const handleDownload = () => {
+    const link = document.createElement("a");
     link.href = `files/modelo-transacao.csv`;
-    link.download = 'modelo-transacao.csv';
+    link.download = "modelo-transacao.csv";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -418,25 +420,35 @@ export default function Transacoes() {
         title={toastTitle}
         showToast={valueToast}
       />
-      <CardTCF
-        title="Listagem de Transações"
-        body={
-          <ListagemComponent
-            columns={columns}
-            transactions={transactions}
-            paginationModel={paginationModel}
-            loading={loading}
-            functionSubmit={handleTransacaoForm}
-            functionHandleDownload={handleDownload}
-            functionHandleModalOpen={handleModalUploadOpen}
-            functionHandleModal={handleTransacaoModal}
-            isModalOpen={isModalTransacaoOpen}
-            modalTitle={modalTitle}
-            typeTransaction={typeTransaction}
-            dataToForm={dataToForm}
+      <Row>
+        <Col xs={12} sm={12} md={12} lg={12} className="mb-3">
+          <CardTCF
+            title="Listagem de Transações"
+            body={
+              <ListagemComponent
+                columns={columns}
+                transactions={transactions}
+                paginationModel={paginationModel}
+                loading={loading}
+                functionSubmit={handleTransacaoForm}
+                functionHandleDownload={handleDownload}
+                functionHandleModalOpen={handleModalUploadOpen}
+                functionHandleModal={handleTransacaoModal}
+                isModalOpen={isModalTransacaoOpen}
+                modalTitle={modalTitle}
+                typeTransaction={typeTransaction}
+                dataToForm={dataToForm}
+              />
+            }
           />
-        }
-      />
+        </Col>
+        <Col xs={12} sm={12} md={12} lg={12}>
+          <CardTCF
+            title="Resumo das Transações"
+            body={<TransacoesGraficos token={token} clientId={userId} />}
+          />
+        </Col>
+      </Row>
       <ModalTCF
         title="Remover Transação"
         isOpen={isModalOpen}
@@ -448,17 +460,12 @@ export default function Transacoes() {
         onCloseAction={handleDeleteClose}
         onSubmitAction={handleCloseDeleteSubmit}
       />
-      <CardTCF
-        title="Resumo das Transações"
-        body={
-          <TransacoesGraficos token={token} clientId={userId} />
-        }
-      />
+
       <ModalUploadTransacoes
         isOpen={isModalUploadOpen}
         body={<p>Conteúdo do modal centralizado e responsivo</p>}
         center={true}
-        type={'home-modal'}
+        type={"home-modal"}
         hasFooter={true}
         onCloseAction={handleModalClose}
         onSubmitAction={fetchTransactions}
@@ -483,7 +490,7 @@ export function ListagemComponent(props: any) {
             label={"Baixar Template"}
             disabled={false}
             size={"sm"}
-            onClick={() =>props.functionHandleDownload()}
+            onClick={() => props.functionHandleDownload()}
           />
 
           <ButtonTCF

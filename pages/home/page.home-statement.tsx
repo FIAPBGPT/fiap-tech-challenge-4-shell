@@ -55,7 +55,8 @@ export default function HomeStatement({ reload, onTransactionsLoaded }: Props) {
   const { data: session } = useSession(); // os dados de sessão podem ser colocados no gerenciador de estados
   const fetchTransactions = async () => {
     if (session === undefined) return;
-    const token: string = session?.user.result.token;
+    if (!session || !session.user) return;
+    const token: string = (session.user as any).token;
     const user: any = jwtDecode(token);
     const res = await transactionsService.getTransactions(axiosHookHandler, {
       userId: user.userId,
