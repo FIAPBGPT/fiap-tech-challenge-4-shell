@@ -56,3 +56,15 @@ export const ErrorMessage = styled.p`
   color: ${(props) => props.theme.themeColor.error};
   font-size: 12px;
 `;
+
+export const UlValidationInfo = styled.ul`
+  font-size: 12px;
+  padding-left: 1rem;
+  list-style-type: none;
+`;
+
+export const DivValidationInfo = styled.div`
+  font-size: 12px;
+  padding-left: 1rem;
+  list-style-type: none;
+`;

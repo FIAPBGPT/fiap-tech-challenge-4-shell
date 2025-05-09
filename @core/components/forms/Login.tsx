@@ -18,9 +18,17 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmitAction }) => {
     email: yup
       .string()
       .email("Por favor, digite um e-mail válido!")
+      .matches(
+        /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/,
+        "Digite um endereço de e-mail válido"
+      )
       .required("Por favor, digite seu e-mail"),
-    password: yup.string().required(),
+    password: yup
+      .string()
+      .required("Por favor, digite sua senha")
+      .min(8, "Senha muito curta - mínimo de 8 caracteres"),
   });
+
   return (
     <>
       <Formik
@@ -66,10 +74,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmitAction }) => {
             </RowCentered>
             <Row>
               <Col xs={12} sm={12} md={12} lg={12}>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput2"
-                >
+                <Form.Group className="mb-3" controlId="email">
                   <FormLabelStrong>E-mail</FormLabelStrong>
                   <Form.Control
                     type="email"
@@ -77,15 +82,19 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmitAction }) => {
                     name="email"
                     value={values.email}
                     onChange={handleChange}
+                    isInvalid={touched.email && !!errors.email}
                     isValid={touched.email && !errors.email}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.email}
+                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="valid">
+                    E-mail válido!
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col xs={12} sm={12} md={12} lg={12}>
-                <Form.Group
-                  className="mb-3"
-                  controlId="exampleForm.ControlInput3"
-                >
+                <Form.Group className="mb-3" controlId="password">
                   <FormLabelStrong>Senha</FormLabelStrong>
                   <Form.Control
                     type="password"
@@ -93,8 +102,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmitAction }) => {
                     name="password"
                     value={values.password}
                     onChange={handleChange}
+                    isInvalid={touched.password && !!errors.password}
                     isValid={touched.password && !errors.password}
                   />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.password}
+                  </Form.Control.Feedback>
+                  <Form.Control.Feedback type="valid">
+                    Senha válida!
+                  </Form.Control.Feedback>
                 </Form.Group>
               </Col>
               <Col xs={12} sm={12} md={12} lg={12}>
@@ -118,4 +134,5 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmitAction }) => {
     </>
   );
 };
+
 export default LoginForm;

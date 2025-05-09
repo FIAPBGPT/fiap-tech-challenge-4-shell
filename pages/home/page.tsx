@@ -346,7 +346,11 @@ export default function Home({ widgets }: Props) {
           </Col>
         </Row>
 
-        <Graficos />
+        <Row>
+          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+            <Graficos />
+          </Col>
+        </Row>
       </Col>
       <Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <Row>

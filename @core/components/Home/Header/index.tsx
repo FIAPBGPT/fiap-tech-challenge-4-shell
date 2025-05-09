@@ -16,6 +16,7 @@ import { signIn, useSession } from "next-auth/react";
 import ToastTCF from "../../Toast";
 import { jwtDecode } from "jwt-decode";
 import useAxiosAuth from "@/@core/hooks/useAxiosAuth";
+import { CadastroFormData } from "@/@core/interfaces/cadastro-form-data";
 
 export default function Header() {
   const router = useRouter();
@@ -49,63 +50,136 @@ export default function Header() {
     }
   };
 
-  const handleCadastroForm = async (formData: any) => {
-    // TODO: function Cadastro Form
-    if (Object.values(formData).indexOf("") === -1) {
-      const formattedFormData: any = {
-        username: formData.name,
-        email: formData.email,
-        password: formData.password,
-      };
-      await axiosAuth
-        .post(`/api/users`, formattedFormData)
-        .then(() => {
-          setShowToast(true);
-          setMessage("Usuário Cadastrado com Sucesso");
-          setIcon("success");
-          setToastTitle("Sucesso!");
-          setTimeout(() => {
-            setShowToast(false);
-          }, 3000);
-          setIsModalCadastroOpen(false);
-        })
-        .catch((error: any) => {
-          setShowToast(true);
-          setMessage(error.response.data.message);
-          setIcon("error");
-          setToastTitle("Erro!");
-          setTimeout(() => {
-            setShowToast(false);
-          }, 3000);
-          console.error(error.response.data.message);
-        });
+  // const handleCadastroForm = async (formData: CadastroFormData) => {
+  //   if (Object.values(formData).indexOf("") === -1) {
+  //     const formattedFormData: any = {
+  //       username: formData.name,
+  //       email: formData.email,
+  //       password: formData.password,
+  //     };
+  //     await axiosAuth
+  //       .post(`/api/users`, formattedFormData)
+  //       .then(() => {
+  //         setShowToast(true);
+  //         setMessage("Usuário Cadastrado com Sucesso");
+  //         setIcon("success");
+  //         setToastTitle("Sucesso!");
+  //         setTimeout(() => {
+  //           setShowToast(false);
+  //         }, 3000);
+  //         setIsModalCadastroOpen(false);
+  //       })
+  //       .catch((error: any) => {
+  //         setShowToast(true);
+  //         setMessage(error.response.data.message);
+  //         setIcon("error");
+  //         setToastTitle("Erro!");
+  //         setTimeout(() => {
+  //           setShowToast(false);
+  //         }, 3000);
+  //         console.error(error.response.data.message);
+  //       });
+  //   }
+  // };
+
+  const handleCadastroForm = async (formData: CadastroFormData) => {
+    const { name, email, password } = formData;
+
+    // Trim dos campos
+    const trimmedName = name.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
+    // Validação de campos vazios
+    if (!trimmedName || !trimmedEmail || !trimmedPassword) {
+      showToast("Atenção!", "Preencha todos os campos!", "warning");
+      return;
+    }
+
+    // Validação de email com regex simples
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(trimmedEmail)) {
+      showToast(
+        "Email inválido",
+        "Digite um endereço de email válido.",
+        "error"
+      );
+      return;
+    }
+
+    // Validação de senha forte (mín. 8 caracteres, 1 maiúscula, 1 minúscula, 1 número, 1 símbolo)
+    const senhaForteRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
+    if (!senhaForteRegex.test(trimmedPassword)) {
+      showToast(
+        "Senha fraca",
+        "A senha deve conter ao menos 8 caracteres, incluindo letra maiúscula, minúscula, número e símbolo.",
+        "error"
+      );
+      return;
+    }
+
+    // Dados formatados
+    const formattedFormData = {
+      username: trimmedName,
+      email: trimmedEmail,
+      password: trimmedPassword,
+    };
+
+    try {
+      await axiosAuth.post(`/api/users`, formattedFormData);
+
+      showToast("Sucesso!", "Usuário cadastrado com sucesso!", "success");
+      setIsModalCadastroOpen(false);
+
+      // Limpar senha do objeto após envio
+      formData.password = "";
+    } catch (error: any) {
+      const erroMensagem =
+        error?.response?.data?.message || "Erro desconhecido ao cadastrar.";
+      console.error("Erro ao cadastrar:", erroMensagem);
+      showToast("Erro!", erroMensagem, "error");
     }
   };
 
+  // Função utilitária pra mostrar toasts
+  const showToast = (title: string, message: string, icon: string) => {
+    setToastTitle(title);
+    setMessage(message);
+    setIcon(icon);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
   const handleLoginForm = async (formData: any) => {
-    if (Object.values(formData).indexOf("") === -1) {
-      try {
-        const res = await signIn("credentials", {
-          email: formData.email,
-          password: formData.password,
-          redirect: false,
-        });
-        if (res && !res.error) {
-          setIsModalLoginOpen(false);
-          router.push("/home");
-        } else {
-          if (res && res.status === 401) {
-            setShowToast(true);
-            setMessage("Usuário não Cadastrado! Realize o seu cadastro!");
-            setIcon("error");
-            setToastTitle("Erro!");
-            setTimeout(() => {
-              setShowToast(false);
-            }, 3000);
-            setIsModalLoginOpen(false);
-          }
-        }
-      } catch (error) {}
+    if (Object.values(formData).includes("")) return;
+
+    const { email, password } = formData;
+
+    // Trim dos campos
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPassword = password.trim();
+
+    try {
+      const res = await signIn("credentials", {
+        email: trimmedEmail,
+        password: trimmedPassword,
+        redirect: false,
+      });
+      if (res && !res.error) {
+        setIsModalLoginOpen(false);
+        router.push("/home");
+      } else {
+        // ⚠️ Exibe o erro real vindo do backend aqui:
+        setShowToast(true);
+        setMessage(res?.error || "Erro ao fazer login.");
+        setIcon("error");
+        setToastTitle("Erro!");
+        setTimeout(() => {
+          setShowToast(false);
+        }, 3000);
+      }
+    } catch (error: any) {
+      console.error("Erro inesperado no login:", error);
     }
   };
 

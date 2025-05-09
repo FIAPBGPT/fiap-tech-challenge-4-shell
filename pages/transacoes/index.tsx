@@ -42,9 +42,9 @@ export default function RootLayout() {
       dispatch(
         returnUserData({
           ...user,
-          token: session.user.result.token,
-          username: session.user.result.username,
-          widgets: session.user.result.widgets,
+          token: (session.user as any).token,
+          username: (session.user as any).username,
+          widgets: (session.user as any).widgets,
         })
       );
     }
