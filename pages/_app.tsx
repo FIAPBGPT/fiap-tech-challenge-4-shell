@@ -11,7 +11,7 @@ import { wrapper } from "../store/store";
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
   return (
-    <Container fluid>
+    <Container fluid  style={{ overflow: "hidden"}}>
       <AppRouterCacheProvider>
         <StyledComponentsRegistry>
           <StyledRoot>

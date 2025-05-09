@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import AvatarIcon from "../../icons/Avatar.svg";
+import AvatarIcon from "../../../../public/Avatar.svg";
 import useWindowSize from "../../hooks/WindowsSize";
 import MenuButton from "../menu/MenuButton";
 import { usePathname } from "next/navigation";
@@ -19,19 +19,20 @@ export default function TransactionsHeader(props: TituloProps) {
   };
 
   const NameHeader = () => {
-    if(width > 360)
-        return <p id='clientName'>{props.name ? props.name : "Carregando Nome de Usuário"}</p>;
+    if (width > 360)
+      return (
+        <p id="clientName">{props.name ? props.name : "Loading user name"}</p>
+      );
   };
 
   return (
-    <StyledHeader
-      className="row no-gutters">
+    <StyledHeader className="row no-gutters">
       <div className="menuNameAvatarContainer">
-          <IconHeader />
-          <div className="nameAvatarContainer">
-            <NameHeader />
-            <Image alt="avatar" src={AvatarIcon} className="avatarIcon" />
-          </div>
+        <IconHeader />
+        <div className="nameAvatarContainer">
+          <NameHeader />
+          <Image alt="avatar" src={AvatarIcon} className="avatarIcon" />
+        </div>
       </div>
     </StyledHeader>
   );

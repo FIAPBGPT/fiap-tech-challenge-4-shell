@@ -5,8 +5,20 @@
 "use client";
 
 import { Row, Col, Spinner } from "react-bootstrap";
-import { useCallback, useEffect, useState } from "react";
-import { AttachMoney, Euro, CurrencyPound, CurrencyFranc } from "@mui/icons-material";
+import {
+  useCallback,
+  useEffect,
+  useState,
+  Suspense,
+  lazy,
+  startTransition,
+} from "react";
+import {
+  AttachMoney,
+  Euro,
+  CurrencyPound,
+  CurrencyFranc,
+} from "@mui/icons-material";
 import HomeStatement from "./page.home-statement";
 import { Transaction } from "../../@core/types/transaction";
 import ToastTCF from "../../@core/components/Toast";
@@ -40,11 +52,20 @@ export default function Home({ widgets }: Props) {
   const dispatch = useDispatch();
   const { user } = useSelector((state: any) => state.user);
 
-  const [cotas, setCotas] = useState<{ nome: string; moeda: string; cotacao: any; variacao: any }[]>([]);
+  const [cotas, setCotas] = useState<
+    { nome: string; moeda: string; cotacao: any; variacao: any }[]
+  >([]);
   const [loading, setLoading] = useState(true);
 
+  // ////LAZY LOADING
+  const CardSaldoComponent = lazy(
+    () => import("../../@core/components/ui/CardSaldo/CardSaldo")
+  );
+  const CardTCF = lazy(() => import("../../@core/components/ui/Card"));
+  // const HomeStatement = lazy(() => import("./page.home-statement"));
+
   // @ts-ignore
-  const Graficos = dynamic(() => import('remoteNextApp/areaGrafico'), {
+  const Graficos = dynamic(() => import("remoteNextApp/areaGrafico"), {
     ssr: false,
     loading: () => (
       <Row>
@@ -69,21 +90,46 @@ export default function Home({ widgets }: Props) {
   useEffect(() => {
     const fetchCotacoes = async () => {
       try {
-        const response = await fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL,CHF-BRL");
+        const response = await fetch(
+          "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL,CHF-BRL"
+        );
         const data = await response.json();
         const formatCurrency = (value: string) => {
           return parseFloat(value)
             .toFixed(2)
-            .replace('.', ',')
+            .replace(".", ",")
             .toLocaleString();
         };
-        setCotas([
-          { nome: "Dólar", moeda: "USD", cotacao: formatCurrency(data.USDBRL.ask), variacao: formatCurrency(data.USDBRL.varBid) },
-          { nome: "Euro", moeda: "EUR", cotacao: formatCurrency(data.EURBRL.ask), variacao: formatCurrency(data.EURBRL.varBid) },
-          { nome: "Libra", moeda: "GBP", cotacao: formatCurrency(data.GBPBRL.ask), variacao: formatCurrency(data.GBPBRL.varBid) },
-          { nome: "Franco Suiço", moeda: "CHF", cotacao: formatCurrency(data.CHFBRL.ask), variacao: formatCurrency(data.CHFBRL.varBid) },
-        ]);
-        setLoading(false);
+
+        startTransition(() => {
+          setCotas([
+            {
+              nome: "Dólar",
+              moeda: "USD",
+              cotacao: formatCurrency(data.USDBRL.ask),
+              variacao: formatCurrency(data.USDBRL.varBid),
+            },
+            {
+              nome: "Euro",
+              moeda: "EUR",
+              cotacao: formatCurrency(data.EURBRL.ask),
+              variacao: formatCurrency(data.EURBRL.varBid),
+            },
+            {
+              nome: "Libra",
+              moeda: "GBP",
+              cotacao: formatCurrency(data.GBPBRL.ask),
+              variacao: formatCurrency(data.GBPBRL.varBid),
+            },
+            {
+              nome: "Franco Suiço",
+              moeda: "CHF",
+              cotacao: formatCurrency(data.CHFBRL.ask),
+              variacao: formatCurrency(data.CHFBRL.varBid),
+            },
+          ]);
+          setLoading(false);
+        });
       } catch (error) {
         console.error("Erro ao buscar cotações:", error);
         setLoading(false);
@@ -92,7 +138,6 @@ export default function Home({ widgets }: Props) {
 
     fetchCotacoes();
   }, []);
-
 
   const getCurrencyIcon = (moeda: any) => {
     switch (moeda) {
@@ -108,8 +153,6 @@ export default function Home({ widgets }: Props) {
         return null;
     }
   };
-
-
 
   const handleTransacaoForm = useCallback(
     async (e: any, formData: any) => {
@@ -303,34 +346,42 @@ export default function Home({ widgets }: Props) {
         showToast={valueToast}
       />
       <Col xs={12} sm={12} md={8} lg={8} xl={8}>
-        <Row className="rowBalance">
-          <Col xs={12} sm={12} md={12} lg={12}>
-            <CardSaldoComponent
-              name={user && user.username}
-              balance={balance}
-              showBalance={false}
-            />
-          </Col>
-        </Row>
-        <Row className="rowCardTCF">
-          <Col xs={12} sm={12} md={12} lg={12}>
-            <CardTCF
-              title="Nova Transação"
-              body={
-                <TransacaoForm
-                  onSubmitAction={handleTransacaoForm}
-                  showDatePicker={false}
-                />
-              }
-            />
-          </Col>
-        </Row>
+        <Suspense
+          fallback={
+            <div className="loading-placeholder" style={{ paddingLeft: 10 }}>
+              Loading main section...
+            </div>
+          }
+        >
+          <Row className="rowBalance">
+            <Col xs={12} sm={12} md={12} lg={12}>
+              <CardSaldoComponent
+                name={user && user.username}
+                balance={balance}
+                showBalance={false}
+              />
+            </Col>
+          </Row>
+          <Row className="rowCardTCF">
+            <Col xs={12} sm={12} md={12} lg={12}>
+              <CardTCF
+                title="Nova Transação"
+                body={
+                  <TransacaoForm
+                    onSubmitAction={handleTransacaoForm}
+                    showDatePicker={false}
+                  />
+                }
+              />
+            </Col>
+          </Row>
+        </Suspense>
 
         <Row className="rowBalance mt-4">
           <Col xs={12} sm={12} md={12} lg={12} xl={12}>
             <div className="d-flex flex-wrap justify-content-between gap-3">
               {loading ? (
-                <div>Carregando...</div>
+                <div>Loading...</div>
               ) : (
                 cotas.map((cotacao, index) => (
                   <CardCotacoes
@@ -352,6 +403,7 @@ export default function Home({ widgets }: Props) {
           </Col>
         </Row>
       </Col>
+
       <Col xs={12} sm={12} md={4} lg={4} xl={4}>
         <Row>
           <Col xs={12} sm={12} md={12} lg={12}>
