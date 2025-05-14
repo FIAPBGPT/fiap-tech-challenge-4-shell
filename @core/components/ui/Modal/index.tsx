@@ -29,7 +29,7 @@ const ModalTCF: React.FC<ModalProps> = ({
             <Modal.Title>{title}</Modal.Title>
           </Modal.Header>
         )}
-        <Modal.Body>{body}</Modal.Body>
+        <Modal.Body data-testid="modal-body">{body}</Modal.Body>
         {hasFooter && (
           <Modal.Footer>
             <Button
