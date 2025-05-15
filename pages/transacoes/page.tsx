@@ -1,57 +1,51 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { Row, Col, Spinner } from "react-bootstrap";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState, useCallback } from "react";
+import { Col, Row, Spinner } from "react-bootstrap";
 import { GridColDef } from "@mui/x-data-grid";
-import transactionTypeDictionary from "../../@core/utils/transaction-type-dictionary";
-import ToastTCF from "../../@core/components/Toast";
-import BaseActions from "../../@core/components/ui/Datatable/BaseActions";
-import CardTCF from "../../@core/components/ui/Card";
-import ModalTCF from "../../@core/components/ui/Modal";
-import ButtonTCF from "../../@core/components/ui/Button";
-import DatatableTCF from "../../@core/components/ui/Datatable";
-import TransacaoForm from "../../@core/components/forms/Transacao";
-import { signOut, useSession } from "next-auth/react";
 import { jwtDecode } from "jwt-decode";
-import useAxiosAuth from "@/@core/hooks/useAxiosAuth";
-import transactionsService from "@/@core/services/api-node/transactions.service";
-import router from "next/router";
-import ModalUploadTransacoes from "./modalUpload";
+import { useSession } from "next-auth/react";
+import { DefaultSession } from "next-auth";
 import { useSelector } from "react-redux";
 import dynamic from "next/dynamic";
+
+import ButtonTCF from "../../@core/components/ui/Button";
+import CardTCF from "../../@core/components/ui/Card";
+import DatatableTCF from "../../@core/components/ui/Datatable";
+import ModalTCF from "../../@core/components/ui/Modal";
+import ToastTCF from "../../@core/components/Toast";
+import BaseActions from "../../@core/components/ui/Datatable/BaseActions";
+import TransacaoForm from "../../@core/components/forms/Transacao";
+import ModalUploadTransacoes from "./modalUpload";
+
+import transactionTypeDictionary from "../../@core/utils/transaction-type-dictionary";
+import useAxiosAuth from "@/@core/hooks/useAxiosAuth";
+import transactionsService from "@/@core/services/api-node/transactions.service";
+import { useTransactions } from "@/@core/hooks/useTransactions";
 
 interface CustomJwtPayload {
   userId: string;
   iat: number;
   exp: number;
 }
+declare module "next-auth" {
+  interface User {
+    token?: string;
+  }
+
+  interface Session extends DefaultSession {
+    user: User;
+  }
+}
 
 export default function Transacoes() {
-  const [transactions, setTransactions] = useState<any>([]);
-  const [rowId, setRowId] = useState(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [modalTitle, setModalTitle] = useState<string>("false");
-  const itemClickedCurrent = useRef<any>();
-  const [isModalTransacaoOpen, setIsModalTransacaoOpen] =
-    useState<boolean>(false);
-  const [typeTransaction, setTypeTransaction] = useState<string>("");
-  const [valueToast, setShowToast] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
-  const [icon, setIcon] = useState<any>("");
-  const [toastTitle, setToastTitle] = useState<string>("");
-  const [dataToForm, setDataToForm] = useState<any>();
-  const axiosHookHandler: any = useAxiosAuth();
-  const [isModalUploadOpen, setIsModalUploadOpen] = useState(false);
-
-  const { data: session } = useSession(); // os dados de sessão podem ser colocados no gerenciador de estados
+  const axiosHookHandler = useAxiosAuth();
+  const { data: session } = useSession();
   const { user } = useSelector((state: any) => state.user);
 
-  const token = session?.user?.result?.token;
+  const token = session?.user?.token;
   let userId = "";
 
   if (token) {
@@ -61,9 +55,32 @@ export default function Transacoes() {
     } catch (error) {
       console.error("Erro ao decodificar o token:", error);
     }
-  } else {
-    console.error("Token não encontrado na sessão.");
   }
+
+  const { data: transactions = [], isLoading, refetch } = useTransactions();
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isModalUploadOpen, setIsModalUploadOpen] = useState(false);
+  const [isModalTransacaoOpen, setIsModalTransacaoOpen] = useState(false);
+  const [isModalLoading, setIsModalLoading] = useState(false);
+  const [typeTransaction, setTypeTransaction] = useState("");
+  const [modalTitle, setModalTitle] = useState("");
+  const [dataToForm, setDataToForm] = useState<any>(null); // Inicializando como null
+  const [rowId, setRowId] = useState(null);
+
+  const [toastState, setToastState] = useState<{
+    show: boolean;
+    title: string;
+    message: string;
+    icon: "success" | "error" | "warning" | "info" | undefined;
+  }>({
+    show: false,
+    title: "",
+    message: "",
+    icon: undefined,
+  });
+
+  const itemClickedCurrent = useRef<any>();
 
   const TransacoesGraficos = dynamic<{ token: string; clientId: string }>(
     // @ts-ignore
@@ -72,13 +89,7 @@ export default function Transacoes() {
       ssr: false,
       loading: () => (
         <Row>
-          <Col
-            xs={12}
-            sm={12}
-            md={12}
-            lg={12}
-            className=" d-flex justify-content-center"
-          >
+          <Col className="d-flex justify-content-center">
             <Spinner
               animation="border"
               role="status"
@@ -91,276 +102,29 @@ export default function Transacoes() {
     }
   );
 
-  const handleDeleteClose = () => {
-    setIsModalOpen(false);
+  const handleToast = (title: string, message: string, icon: "success" | "error" | "warning" | "info" | undefined) => {
+    setToastState({ show: true, title, message, icon });
+    setTimeout(() => setToastState({ ...toastState, show: false }), 3000);
   };
 
-  const handleModalUploadOpen = () => {
-    setIsModalUploadOpen(true);
-  };
-  const handleModalClose = () => {
-    setIsModalUploadOpen(false);
-    setLoading(false);
-  };
-
-  const handleCloseDeleteSubmit = async () => {
-    const criteriaToDelete: any = {
-      id: itemClickedCurrent.current,
-    };
-    await transactionsService
-      .deleteTransaction(axiosHookHandler, criteriaToDelete)
-      .then(() => {
-        fetchTransactions();
-        setShowToast(true);
-        setMessage("Transação Removida com Sucesso");
-        setIcon("success");
-        setToastTitle("Sucesso!");
-        setTimeout(() => {
-          setShowToast(false);
-        }, 3000);
-        setLoading(true);
-        setIsModalOpen(false);
-      });
-  };
-
-  const handleTransacaoModal = async (
-    type: string,
-    state: boolean,
-    value?: any
-  ) => {
-    const criteria: any = {
-      id: value,
-    };
-    switch (type) {
-      case "add":
-        setModalTitle("Nova Transação");
-        setIsModalTransacaoOpen(state);
-        setTypeTransaction(type);
-        break;
-      case "edit":
-        setModalTitle("Editar Transação");
-        setTypeTransaction(type);
-        await transactionsService
-          .getTransactionById(axiosHookHandler, criteria)
-          .then((res: any) => {
-            setDataToForm(res.data);
-            setIsModalTransacaoOpen(state);
-          });
-        break;
-      case "view":
-        setModalTitle("Visualizar Transação");
-        setTypeTransaction(type);
-        await transactionsService
-          .getTransactionById(axiosHookHandler, criteria)
-          .then((res: any) => {
-            setDataToForm(res.data);
-            setIsModalTransacaoOpen(state);
-          });
-        break;
-      default:
-        setIsModalTransacaoOpen(state);
-        break;
-    }
-  };
+  const handleModalUploadOpen = () => setIsModalUploadOpen(true);
+  const handleModalClose = () => setIsModalUploadOpen(false);
+  const handleDeleteClose = () => setIsModalOpen(false);
 
   const handleShowDelete = (itemClicked: any) => {
     setIsModalOpen(true);
     itemClickedCurrent.current = itemClicked;
   };
 
-  const handleTransacaoForm = useCallback(
-    async (e: Event, formData: any) => {
-      e.preventDefault();
-      if (user.token === "") return;
-      const token: string = user.token;
-      const decodedUser: any = jwtDecode(token);
-      console.log(user);
-      switch (typeTransaction) {
-        case "add":
-          const formattedFormDataAdd: any = {
-            ...formData,
-            userId: decodedUser.userId,
-            description: "Transação Criada na Tela de Transações",
-          };
-          await transactionsService
-            .createTransaction(axiosHookHandler, formattedFormDataAdd)
-            .then(() => {
-              fetchTransactions();
-              setShowToast(true);
-              setMessage("Transação Realizada com Sucesso");
-              setIcon("success");
-              setToastTitle("Sucesso!");
-              setTimeout(() => {
-                setShowToast(false);
-              }, 3000);
-            })
-            .catch((error: any) => {
-              setShowToast(true);
-              setMessage(error.response.data.message);
-              setIcon("error");
-              setToastTitle("Erro!");
-              setTimeout(() => {
-                setShowToast(false);
-              }, 3000);
-              console.error(error.response.data.message);
-            });
-
-          // CÓDIGO DA FASE 1 - PARA CRITÉRIO DE COMPARAÇÃO
-          // await createTransaction(formData)
-          //   .then((res: any) => {
-          //     const transacoesToTable = res;
-          //     setTransactions(transacoesToTable);
-          //     setShowToast(true);
-          //     setMessage("Transação Realizada com Sucesso");
-          //     setIcon("success");
-          //     setToastTitle("Sucesso!");
-          //     setTimeout(() => {
-          //       setShowToast(false);
-          //     }, 3000);
-          //   })
-          //   .catch((error: any) => {
-          //     setShowToast(true);
-          //     setMessage(error);
-          //     setIcon("error");
-          //     setToastTitle("Erro!");
-          //     setTimeout(() => {
-          //       setShowToast(false);
-          //     }, 3000);
-          //     console.error(error);
-          //     setLoading(false);
-          //   });
-          setLoading(true);
-          setIsModalTransacaoOpen(false);
-          break;
-        case "edit":
-          const transactionId: any = { id: formData._id };
-          const formattedFormDataEdit: any = {
-            ...formData,
-            userId: decodedUser.userId,
-            description: "Transação Editada na Tela de Transações",
-          };
-          await transactionsService
-            .updateTransaction(
-              axiosHookHandler,
-              formattedFormDataEdit,
-              transactionId
-            )
-            .then(() => {
-              fetchTransactions();
-              setShowToast(true);
-              setMessage("Transação Atualizada com Sucesso");
-              setIcon("success");
-              setToastTitle("Sucesso!");
-              setTimeout(() => {
-                setShowToast(false);
-              }, 3000);
-            })
-            .catch((error: any) => {
-              setShowToast(true);
-              setMessage(error.response.data.message);
-              setIcon("error");
-              setToastTitle("Erro!");
-              setTimeout(() => {
-                setShowToast(false);
-              }, 3000);
-              console.error(error.response.data.message);
-            });
-
-          // CÓDIGO DA FASE 1 - PARA CRITÉRIO DE COMPARAÇÃO
-          // await updateTransaction(dataToForm.id, formData)
-          //   .then((res: any) => {
-          //     const transacoesToTable = res;
-          //     setTransactions(transacoesToTable);
-          //     setShowToast(true);
-          //     setMessage("Transação Modificada com Sucesso");
-          //     setIcon("success");
-          //     setToastTitle("Sucesso!");
-          //     setTimeout(() => {
-          //       setShowToast(false);
-          //     }, 3000);
-          //   })
-          //   .catch((error: any) => {
-          //     setShowToast(true);
-          //     setMessage(error);
-          //     setIcon("error");
-          //     setToastTitle("Erro!");
-          //     setTimeout(() => {
-          //       setShowToast(false);
-          //     }, 3000);
-          //     console.error(error);
-          //     setLoading(false);
-          //   });
-
-          setLoading(true);
-          setIsModalTransacaoOpen(false);
-          break;
-        default:
-          setLoading(true);
-          setIsModalTransacaoOpen(false);
-          break;
-      }
-    },
-    [user]
-  );
-
-  const fetchTransactions = useCallback(async () => {
-    if (user.token === "") return;
-    setLoading(true);
-    const token: string = user.token;
-    const decodedUser: any = jwtDecode(token);
-
-    try {
-      await transactionsService
-        .getTransactions(axiosHookHandler, {
-          userId: decodedUser.userId,
-        })
-        .then((res: any) => {
-          const options: any = {
-            weekday: "long",
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-            hour: "numeric",
-            minute: "numeric",
-            second: "numeric",
-          };
-          const transacoesToTable = res.data.result.map((item: any) => {
-            return {
-              ...item,
-              amount:
-                item.transactionType == "deposito"
-                  ? item.amount
-                  : item.amount * -1,
-              transaction: transactionTypeDictionary.get(item.transactionType),
-              date: new Date(item.date).toLocaleDateString("pt-br", options),
-              id: item._id,
-            };
-          });
-          setTransactions(transacoesToTable);
-          setLoading(false);
-        })
-        .catch((error: any) => {
-          if (error.response.status === 401) {
-            setShowToast(true);
-            setMessage(error.response.data.message);
-            setIcon("error");
-            setToastTitle("Erro!");
-            setTimeout(() => {
-              setShowToast(false);
-            }, 3000);
-            router.push("/");
-            signOut({
-              redirect: false,
-            });
-          }
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } catch (error: any) {
-      console.error(error);
-    }
-  }, [user, handleTransacaoForm]);
+  const handleCloseDeleteSubmit = async () => {
+    await transactionsService
+      .deleteTransaction(axiosHookHandler, { id: itemClickedCurrent.current })
+      .then(() => {
+        refetch();
+        handleToast("Sucesso!", "Transação Removida com Sucesso", "success");
+        setIsModalOpen(false);
+      });
+  };
 
   const handleDownload = () => {
     const link = document.createElement("a");
@@ -370,6 +134,77 @@ export default function Transacoes() {
     link.click();
     document.body.removeChild(link);
   };
+
+  const handleTransacaoModal = async (
+    type: string,
+    state: boolean,
+    value?: any
+  ) => {
+    setTypeTransaction(type);
+    setModalTitle(
+      type === "add"
+        ? "Nova Transação"
+        : type === "edit"
+        ? "Editar Transação"
+        : "Visualizar Transação"
+    );
+
+    if (type !== "add" && value) {
+      try {
+        setIsModalLoading(true); // 👉 Começa loading
+        const res = await transactionsService.getTransactionById(
+          axiosHookHandler,
+          { id: value }
+        );
+        setDataToForm(res.data);
+        setIsModalLoading(false); // 👉 Finaliza loading
+        setIsModalTransacaoOpen(state);
+      } catch (error) {
+        console.error(error);
+        setIsModalLoading(false);
+      }
+    } else {
+      setDataToForm({});
+      setIsModalTransacaoOpen(state);
+    }
+  };
+
+  const handleTransacaoForm = useCallback(
+    async (e: Event, formData: any) => {
+      e.preventDefault();
+      if (!user.token) return;
+
+      const decodedUser: any = jwtDecode(user.token);
+
+      const payload = {
+        ...formData,
+        userId: decodedUser.userId,
+        description:
+          typeTransaction === "add" ? "Transação Criada" : "Transação Editada",
+      };
+
+      try {
+        if (typeTransaction === "add") {
+          await transactionsService.createTransaction(
+            axiosHookHandler,
+            payload
+          );
+        } else {
+          await transactionsService.updateTransaction(
+            axiosHookHandler,
+            payload,
+            { id: formData._id }
+          );
+        }
+        refetch();
+      } catch (error) {
+        console.error(error);
+      }
+
+      setIsModalTransacaoOpen(false); // Fecha o modal após salvar
+    },
+    [typeTransaction, user, refetch]
+  );
 
   const columns: GridColDef[] = [
     {
@@ -406,30 +241,47 @@ export default function Transacoes() {
     },
   ];
 
-  const paginationModel = { page: 0, pageSize: 5 };
+  const parsedTransactions = transactions.map((item: any) => {
+    const options: any = {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    };
 
-  useEffect(() => {
-    fetchTransactions();
-  }, [user]);
+    return {
+      ...item,
+      amount:
+        item.transactionType === "deposito" ? item.amount : item.amount * -1,
+      transaction: transactionTypeDictionary.get(item.transactionType),
+      date: new Date(item.date).toLocaleDateString("pt-BR", options),
+      id: item._id,
+    };
+  });
 
   return (
     <>
+     
       <ToastTCF
-        icon={icon}
-        message={message}
-        title={toastTitle}
-        showToast={valueToast}
+        icon={toastState.icon}
+        message={toastState.message}
+        title={toastState.title}
+        showToast={toastState.show}
       />
+
       <Row>
-        <Col xs={12} sm={12} md={12} lg={12} className="mb-3">
+        <Col xs={12} className="mb-3">
           <CardTCF
             title="Listagem de Transações"
             body={
               <ListagemComponent
                 columns={columns}
-                transactions={transactions}
-                paginationModel={paginationModel}
-                loading={loading}
+                transactions={parsedTransactions}
+                paginationModel={{ page: 0, pageSize: 5 }}
+                loading={isLoading}
                 functionSubmit={handleTransacaoForm}
                 functionHandleDownload={handleDownload}
                 functionHandleModalOpen={handleModalUploadOpen}
@@ -438,21 +290,23 @@ export default function Transacoes() {
                 modalTitle={modalTitle}
                 typeTransaction={typeTransaction}
                 dataToForm={dataToForm}
+                isModalLoading={isModalLoading}
               />
             }
           />
         </Col>
-        <Col xs={12} sm={12} md={12} lg={12}>
+        <Col xs={12}>
           <CardTCF
             title="Resumo das Transações"
-            body={<TransacoesGraficos token={token} clientId={userId} />}
+            body={<TransacoesGraficos token={token!} clientId={userId} />}
           />
         </Col>
       </Row>
+
       <ModalTCF
         title="Remover Transação"
         isOpen={isModalOpen}
-        body={"Tem certeza que deseja remover essa transação?"}
+        body="Tem certeza que deseja remover essa transação?"
         hasFooter={true}
         center={true}
         sizeModal="md"
@@ -468,7 +322,7 @@ export default function Transacoes() {
         type={"home-modal"}
         hasFooter={true}
         onCloseAction={handleModalClose}
-        onSubmitAction={fetchTransactions}
+        onSubmitAction={refetch}
       />
     </>
   );
@@ -518,24 +372,35 @@ export function ListagemComponent(props: any) {
           />
         </Col>
       </Row>
-      <ModalTCF
-        isOpen={props.isModalOpen}
-        body={
-          <TransacaoForm
-            isEdit={props.typeTransaction === "edit"}
-            isView={props.typeTransaction === "view"}
-            formValues={props.dataToForm}
-            showDatePicker={true}
-            onSubmitAction={props.functionSubmit}
-          />
-        }
-        title={props.modalTitle}
-        hasFooter={false}
-        center={true}
-        sizeModal="md"
-        type={"transacao"}
-        onCloseAction={() => props.functionHandleModal("", false)}
-      />
+      {props.isModalOpen && (
+        <ModalTCF
+          isOpen={true}
+          body={
+            props.isModalLoading ? (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ minHeight: "200px" }}
+              >
+                <Spinner animation="border" variant="primary" />
+              </div>
+            ) : (
+              <TransacaoForm
+                isEdit={props.typeTransaction === "edit"}
+                isView={props.typeTransaction === "view"}
+                formValues={props.dataToForm || {}}
+                showDatePicker={true}
+                onSubmitAction={props.functionSubmit}
+              />
+            )
+          }
+          title={props.modalTitle}
+          hasFooter={false}
+          center={true}
+          sizeModal="md"
+          type={"transacao"}
+          onCloseAction={() => props.functionHandleModal("", false)}
+        />
+      )}
     </>
   );
 }

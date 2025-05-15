@@ -16,6 +16,7 @@ import router from "next/router";
 import { Row } from "react-bootstrap";
 import { returnUserData } from "../../store/user/action";
 import { useSelector, useDispatch } from "react-redux";
+import Head from "next/head";
 
 export const metadata: Metadata = {
   title: "Bytebank - Início",
@@ -38,13 +39,11 @@ export default function RootLayout() {
       const newSession = {
         ...session,
         user: {
-          result: {
-            ...session.user,
-            widgets:
-              Object.keys(widgetsChosen).length === 0
-                ? (session.user as any).widgets
-                : widgetsChosen,
-          },
+          ...session.user,
+          widgets:
+            Object.keys(widgetsChosen).length === 0
+              ? session.user.widgets
+              : widgetsChosen,
         },
       };
 
@@ -81,9 +80,14 @@ export default function RootLayout() {
 
   return (
     <>
+      <Head>
+        <title>Bytebank - Dashboard</title>
+        <meta name="description" content="Dashboard do site Bytebank" />
+        <link rel="icon" href="/icon.svg" type="image/svg" />
+      </Head>
       <TransactionsHeader name={user && user.username} />
       <Row>
-        <div className="col-xs-12 col-sm-12 col-md-3 col-xl-2"  style= {{paddingTop: 15, paddingLeft:40}}>
+        <div className="col-xs-12 col-sm-12 col-md-3 col-xl-2 pe-0">
           <div className="d-flex flex-column align-items-center align-items-sm-start h-100">
             <Menu />
           </div>

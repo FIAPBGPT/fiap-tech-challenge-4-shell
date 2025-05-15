@@ -1,145 +1,113 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-/* eslint-disable @typescript-eslint/ban-ts-comment */
-/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 "use client";
 
-import { Row, Col, Spinner } from "react-bootstrap";
-import {
-  useCallback,
-  useEffect,
-  useState,
-  Suspense,
-  lazy,
-  startTransition,
-} from "react";
+import { useEffect, useState, Suspense, lazy, useCallback } from "react";
+import { Col, Row, Spinner } from "react-bootstrap";
 import {
   AttachMoney,
   Euro,
   CurrencyPound,
   CurrencyFranc,
 } from "@mui/icons-material";
-import HomeStatement from "./page.home-statement";
-import { Transaction } from "../../@core/types/transaction";
-import ToastTCF from "../../@core/components/Toast";
-import CardSaldoComponent from "../../@core/components/ui/CardSaldo/CardSaldo";
-import CardTCF from "../../@core/components/ui/Card";
-import TransacaoForm from "../../@core/components/forms/Transacao";
-import { jwtDecode } from "jwt-decode";
-import useAxiosAuth from "@/@core/hooks/useAxiosAuth";
-import transactionsService from "@/@core/services/api-node/transactions.service";
 import dynamic from "next/dynamic";
-import { useDispatch, useSelector } from "react-redux";
-import CardCotacoes from "@/@core/components/ui/CardCotacoes/CardCotacoes";
-import { returnUserData } from "@/store/user/action";
-import userService from "@/@core/services/api-node/user.service";
+import { jwtDecode } from "jwt-decode";
+import { useSelector, useDispatch } from "react-redux";
 
-interface Props {
-  widgets: (value: any) => void;
+import ToastTCF from "@/@core/components/Toast";
+import CardCotacoes from "@/@core/components/ui/CardCotacoes/CardCotacoes";
+import TransacaoForm from "@/@core/components/forms/Transacao";
+import useAxiosAuth from "@/@core/hooks/useAxiosAuth";
+import userService from "@/@core/services/api-node/user.service";
+import transactionsService from "@/@core/services/api-node/transactions.service";
+import { returnUserData } from "@/store/user/action";
+import { useTransactions } from "@/@core/hooks/useTransactions";
+import { useCotacoes } from "@/@core/hooks/useCotacoes";
+import { useQueryClient } from "@tanstack/react-query";
+
+const CardSaldoComponent = lazy(
+  () => import("@/@core/components/ui/CardSaldo/CardSaldo")
+);
+const CardTCF = lazy(() => import("@/@core/components/ui/Card"));
+const HomeStatement = lazy(() => import("./page.home-statement"));
+
+// @ts-expect-error
+const Graficos = dynamic(() => import("remoteNextApp/areaGrafico"), {
+  ssr: false,
+  loading: () => <Spinner animation="border" variant="secondary" size="sm" />,
+});
+
+// @ts-expect-error
+const WidgetsComponent = dynamic(() => import("remoteNextApp/widgets"), {
+  ssr: false,
+  loading: () => <Spinner animation="border" variant="secondary" size="sm" />,
+});
+
+interface WidgetProps {
+  id: string;
+  name: string;
+  data: Record<string, unknown>;
 }
 
-export default function Home({ widgets }: Props) {
-  const [valueToast, setShowToast] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>("");
-  const [icon, setIcon] = useState<any>("");
-  const [toastTitle, setToastTitle] = useState<string>("");
-  const [reloadStatement, setReloadStatement] = useState<boolean>(false);
-  const [loadWidgets, setLoadWidgets] = useState<boolean>(false);
-  const [balance, setBalance] = useState(0);
-  const [transactionsToMFE, setTransactionsToMFE] = useState<any>({});
-  const [widgetsToMFE, setWidgetsToMFE] = useState<any>({});
-  const axiosHookHandler: any = useAxiosAuth();
-  const dispatch = useDispatch();
-  const { user } = useSelector((state: any) => state.user);
-
-  const [cotas, setCotas] = useState<
-    { nome: string; moeda: string; cotacao: any; variacao: any }[]
-  >([]);
-  const [loading, setLoading] = useState(true);
-
-  // ////LAZY LOADING
-  const CardSaldoComponent = lazy(
-    () => import("../../@core/components/ui/CardSaldo/CardSaldo")
-  );
-  const CardTCF = lazy(() => import("../../@core/components/ui/Card"));
-  // const HomeStatement = lazy(() => import("./page.home-statement"));
-
-  // @ts-ignore
-  const Graficos = dynamic(() => import("remoteNextApp/areaGrafico"), {
-    ssr: false,
-    loading: () => (
-      <Row>
-        <Col
-          xs={12}
-          sm={12}
-          md={12}
-          lg={12}
-          className=" d-flex justify-content-center"
-        >
-          <Spinner
-            animation="border"
-            role="status"
-            variant="secondary"
-            size="sm"
-          />
-        </Col>
-      </Row>
-    ),
-  });
-
+export default function Home({ widgets }: { widgets: WidgetProps[] }) {
+  const [hasMounted, setHasMounted] = useState(false);
   useEffect(() => {
-    const fetchCotacoes = async () => {
-      try {
-        const response = await fetch(
-          "https://economia.awesomeapi.com.br/json/last/USD-BRL,EUR-BRL,GBP-BRL,CHF-BRL"
-        );
-        const data = await response.json();
-        const formatCurrency = (value: string) => {
-          return parseFloat(value)
-            .toFixed(2)
-            .replace(".", ",")
-            .toLocaleString();
-        };
-
-        startTransition(() => {
-          setCotas([
-            {
-              nome: "Dólar",
-              moeda: "USD",
-              cotacao: formatCurrency(data.USDBRL.ask),
-              variacao: formatCurrency(data.USDBRL.varBid),
-            },
-            {
-              nome: "Euro",
-              moeda: "EUR",
-              cotacao: formatCurrency(data.EURBRL.ask),
-              variacao: formatCurrency(data.EURBRL.varBid),
-            },
-            {
-              nome: "Libra",
-              moeda: "GBP",
-              cotacao: formatCurrency(data.GBPBRL.ask),
-              variacao: formatCurrency(data.GBPBRL.varBid),
-            },
-            {
-              nome: "Franco Suiço",
-              moeda: "CHF",
-              cotacao: formatCurrency(data.CHFBRL.ask),
-              variacao: formatCurrency(data.CHFBRL.varBid),
-            },
-          ]);
-          setLoading(false);
-        });
-      } catch (error) {
-        console.error("Erro ao buscar cotações:", error);
-        setLoading(false);
-      }
-    };
-
-    fetchCotacoes();
+    setHasMounted(true);
   }, []);
 
-  const getCurrencyIcon = (moeda: any) => {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state: unknown) => state.user);
+  const axiosHookHandler = useAxiosAuth();
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { data: transactions = [], isLoading: loadingTransactions } =
+    useTransactions();
+  const {
+    data: cotas = [],
+    isLoading: loadingCotas,
+    isSuccess,
+  } = useCotacoes();
+
+  const [balance, setBalance] = useState(0);
+  const [transactionsToMFE, setTransactionsToMFE] = useState<unknown>([]);
+  const [widgetsToMFE, setWidgetsToMFE] = useState<unknown>({});
+  const [loadWidgets, setLoadWidgets] = useState(false);
+  const [valueToast, setShowToast] = useState(false);
+  const [message, setMessage] = useState("");
+  const [icon, setIcon] = useState<
+    "success" | "error" | "warning" | "info" | undefined
+  >(undefined);
+  const [toastTitle, setToastTitle] = useState("");
+  const [reloadStatement, setReloadStatement] = useState<boolean>(false);
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!transactions || transactions.length === 0) return;
+
+    setTransactionsToMFE(transactions);
+
+    const saldoCalculado = transactions.reduce((sum: number, t: any) => {
+      const tipo = t.transactionType;
+      const valor = t.amount;
+
+      const tiposEntrada = ["deposito", "credito", "pix", "ted", "tef"];
+      const tiposSaida = ["debito"];
+
+      if (tiposEntrada.includes(tipo)) {
+        return sum + valor;
+      }
+
+      if (tiposSaida.includes(tipo)) {
+        return sum - valor;
+      }
+
+      return sum; // Ignora tipos desconhecidos
+    }, 0);
+
+    setBalance(saldoCalculado);
+  }, [transactions]);
+
+  const getCurrencyIcon = (moeda: string) => {
     switch (moeda) {
       case "USD":
         return <AttachMoney />;
@@ -157,133 +125,48 @@ export default function Home({ widgets }: Props) {
   const handleTransacaoForm = useCallback(
     async (e: any, formData: any) => {
       e.preventDefault();
-      if (user.token === "") return;
+
       const token: string = user.token;
       const decodedUser: any = jwtDecode(token);
-      const formattedFormData: any = {
+      const formattedFormData = {
         ...formData,
         userId: decodedUser.userId,
         description: "Transação Realizada na Home",
       };
-      await transactionsService
-        .createTransaction(axiosHookHandler, formattedFormData)
-        .then(() => {
-          setShowToast(true);
-          setMessage("Transação Realizada com Sucesso");
-          setIcon("success");
-          setToastTitle("Sucesso!");
-          setReloadStatement(true);
-          setTimeout(() => {
-            setShowToast(false);
-          }, 3000);
-        })
-        .catch((error: any) => {
-          setShowToast(true);
-          setMessage(error.response.data.message);
-          setIcon("error");
-          setToastTitle("Erro!");
-          setTimeout(() => {
-            setShowToast(false);
-          }, 3000);
-          console.error(error.response.data.message);
-        });
 
-      // CÓDIGO DA FASE 1 - Para efeito comparativo
-      // await createTransaction(formData)
-      //   .then(() => {
-      //     setShowToast(true);
-      //     setMessage("Transação Realizada com Sucesso");
-      //     setIcon("success");
-      //     setToastTitle("Sucesso!");
-      //     setReloadStatement(true);
-      //     setTimeout(() => {
-      //       setShowToast(false);
-      //     }, 3000);
-      //   })
-      //   .catch((error: any) => {
-      //     setShowToast(true);
-      //     setMessage(error);
-      //     setIcon("error");
-      //     setToastTitle("Erro!");
-      //     setTimeout(() => {
-      //       setShowToast(false);
-      //     }, 3000);
-      //     console.error(error);
-      //   });
+      try {
+        await transactionsService.createTransaction(
+          axiosHookHandler,
+          formattedFormData
+        );
+
+        // ✅ Atualiza a lista de transações
+        queryClient.invalidateQueries({ queryKey: ["transactions"] });
+
+        setShowToast(true);
+        setMessage("Transação Realizada com Sucesso");
+        setIcon("success");
+        setToastTitle("Sucesso!");
+        setReloadStatement(true);
+        setTimeout(() => setShowToast(false), 3000);
+      } catch (error: any) {
+        setShowToast(true);
+        setMessage(error.response?.data?.message || "Erro");
+        setIcon("error");
+        setToastTitle("Erro!");
+        setTimeout(() => setShowToast(false), 3000);
+      }
     },
-    [user]
+    [user, axiosHookHandler]
   );
 
   useEffect(() => {
     if (reloadStatement === true) setReloadStatement(false);
   }, [reloadStatement]);
 
-  const calculateBalance = (transactions: []) => {
-    if (transactions === undefined) return;
-    setTransactionsToMFE(transactions);
-    setBalance((_) => {
-      const transactionsFiltered: any = transactions.filter(
-        (transaction: any) => transaction.transactionType !== "credito"
-      );
-      return transactionsFiltered.reduce(
-        (sum: any, transaction: Transaction) => {
-          const amountMultiplier =
-            transaction.transactionType == "deposito" ? 1 : -1;
-
-          return sum + transaction.amount * amountMultiplier;
-        },
-        0
-      );
-    });
-  };
-
-  // @ts-ignore
-  const WidgetsComponent = dynamic(() => import("remoteNextApp/widgets"), {
-    ssr: false,
-    loading: () => (
-      <Row>
-        <Col
-          xs={12}
-          sm={12}
-          md={12}
-          lg={12}
-          className=" d-flex justify-content-center"
-        >
-          <Spinner
-            animation="border"
-            role="status"
-            variant="secondary"
-            size="sm"
-          />
-        </Col>
-      </Row>
-    ),
-  });
-
-  const WidgetComponentCaller = ({
-    loadingComponent,
-    userSession,
-    transactions,
-    setWidgets,
-  }: {
-    loadingComponent: boolean;
-    userSession: any;
-    transactions: any;
-    setWidgets: (value: any) => void;
-  }) => {
-    return (
-      <WidgetsComponent
-        // @ts-ignore
-        loading={loadingComponent}
-        userSession={userSession}
-        transactions={transactions}
-        setWidgets={setWidgets}
-      />
-    );
-  };
-
   const updateUserWidgets = useCallback(async () => {
-    if (user.token === "" || Object.keys(widgetsToMFE).length === 0) return;
+    if (user.token === "" || Object.keys(widgetsToMFE as object).length === 0)
+      return;
     const token: string = user.token;
     const decodedUser: any = jwtDecode(token);
 
@@ -331,11 +214,10 @@ export default function Home({ widgets }: Props) {
   useEffect(() => {
     if (user.username === "") return;
     setLoadWidgets(true);
-    setTimeout(() => {
-      setLoadWidgets(false);
-    }, 2000);
+    setTimeout(() => setLoadWidgets(false), 2000);
     widgets(widgetsToMFE);
   }, [user]);
+  if (!hasMounted) return null;
 
   return (
     <>
@@ -345,25 +227,24 @@ export default function Home({ widgets }: Props) {
         title={toastTitle}
         showToast={valueToast}
       />
-      <Col xs={12} sm={12} md={8} lg={8} xl={8}>
-        <Suspense
-          fallback={
-            <div className="loading-placeholder" style={{ paddingLeft: 10 }}>
-              Loading main section...
-            </div>
-          }
-        >
-          <Row className="rowBalance">
-            <Col xs={12} sm={12} md={12} lg={12}>
-              <CardSaldoComponent
-                name={user && user.username}
-                balance={balance}
-                showBalance={false}
-              />
+
+      <Col xs={12} sm={12} md={7} lg={7} xl={7}>
+        <Suspense fallback={<div>Carregando...</div>}>
+          <Row>
+            <Col>
+              {loadingTransactions || !isSuccess ? (
+                <div>Carregando saldo...</div>
+              ) : (
+                <CardSaldoComponent
+                  name={user?.username}
+                  balance={balance}
+                  showBalance={false}
+                />
+              )}
             </Col>
           </Row>
-          <Row className="rowCardTCF">
-            <Col xs={12} sm={12} md={12} lg={12}>
+          <Row className="mt-4">
+            <Col>
               <CardTCF
                 title="Nova Transação"
                 body={
@@ -377,15 +258,15 @@ export default function Home({ widgets }: Props) {
           </Row>
         </Suspense>
 
-        <Row className="rowBalance mt-4">
-          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Row className="mt-4">
+          <Col>
             <div className="d-flex flex-wrap justify-content-between gap-3">
-              {loading ? (
-                <div>Loading...</div>
+              {loadingCotas || !isSuccess ? (
+                <div>Carregando cotações...</div>
               ) : (
-                cotas.map((cotacao, index) => (
+                cotas.map((cotacao, idx) => (
                   <CardCotacoes
-                    key={index}
+                    key={idx}
                     moeda={<span>{getCurrencyIcon(cotacao.moeda)}</span>}
                     nome={cotacao.nome}
                     cotacao={cotacao.cotacao}
@@ -397,24 +278,24 @@ export default function Home({ widgets }: Props) {
           </Col>
         </Row>
 
-        <Row>
-          <Col xs={12} sm={12} md={12} lg={12} xl={12}>
+        <Row className="mt-4">
+          <Col>
             <Graficos />
           </Col>
         </Row>
       </Col>
 
-      <Col xs={12} sm={12} md={4} lg={4} xl={4}>
+      <Col className="pe-0" xs={12} sm={12} md={5} lg={5} xl={5}>
         <Row>
-          <Col xs={12} sm={12} md={12} lg={12}>
+          <Col className="ps-0" xs={12} sm={12} md={12} lg={12} xl={12}>
             <HomeStatement
-              onTransactionsLoaded={calculateBalance}
+              onTransactionsLoaded={() => {}}
               reload={reloadStatement}
             />
           </Col>
-          <Col xs={12} sm={12} md={12} lg={12} className="mt-3">
-            <WidgetComponentCaller
-              loadingComponent={loadWidgets}
+          <Col className="mt-3 ps-0" xs={12} sm={12} md={12} lg={12} xl={12}>
+            <WidgetsComponent
+              loading={loadWidgets}
               userSession={user}
               transactions={transactionsToMFE}
               setWidgets={setWidgetsToMFE}

@@ -8,16 +8,26 @@ import { StyledRoot } from "@/@theme/styledRoot";
 import { Suspense } from "react";
 import Loading from "./loading";
 import { wrapper } from "../store/store";
+import {
+  HydrationBoundary,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
+  const queryClient = new QueryClient();
   return (
-    <Container fluid  style={{ overflow: "hidden"}}>
+    <Container fluid style={{ overflow: "hidden" }}>
       <AppRouterCacheProvider>
         <StyledComponentsRegistry>
           <StyledRoot>
             <Suspense fallback={<Loading />}>
               <SessionProvider session={session}>
-                <Component {...pageProps} />
+                <QueryClientProvider client={queryClient}>
+                  <HydrationBoundary state={pageProps.dehydratedState}>
+                    <Component {...pageProps} />
+                  </HydrationBoundary>
+                </QueryClientProvider>
               </SessionProvider>
             </Suspense>
           </StyledRoot>

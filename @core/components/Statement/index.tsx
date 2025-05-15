@@ -137,15 +137,20 @@ export default ({ transactions, loading }: any) => {
         </div>
       </header>
 
-      {loading
-        ? placeholder()
-        : Object.entries(transactionsByMonth()).map((monthTransactions) => (
-            <StatementSection
-              key={monthTransactions[0]}
-              month={monthTransactions[0]}
-              items={monthTransactions[1] as StatementItemProps[]}
-            />
-          ))}
+      {loading ? (
+        placeholder()
+      ) : Object.keys(transactionsByMonth()).length === 0 ? (
+        <p className="text-center mt-2">Nenhum dado disponível.</p>
+      ) : (
+        Object.entries(transactionsByMonth()).map(([month, items]) => (
+          <StatementSection
+            key={month}
+            month={month}
+            items={items as StatementItemProps[]}
+          />
+        ))
+      )}
     </Container>
   );
+
 };
