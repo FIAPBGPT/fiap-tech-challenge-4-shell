@@ -13,6 +13,16 @@ const config = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/$1",
   },
+  collectCoverage: true,               
+  coverageDirectory: 'coverage',       
+  coverageReporters: ['text', 'lcov'], 
+  collectCoverageFrom: [               
+   '@core/components/**/*.{js,jsx,ts,tsx}',
+  ],
+  testMatch: [
+    "**/__tests__/**/*.[jt]s?(x)",           
+    "**/?(*.)+(spec|test).[jt]s?(x)",
+  ],
   // Add more setup options before each test is run
   // setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 }
