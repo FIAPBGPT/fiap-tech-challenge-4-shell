@@ -23,7 +23,11 @@ const TransacaoForm: React.FC<TransacaoFormProps> = ({
 }) => {
   const { Formik } = formik;
   const [startDate, setStartDate] = useState(new Date());
-  const initialValue = useRef<any>({});
+  const initialValue = useRef<any>({
+    transactionType: "",
+    amount: "",
+    date: new Date(), // Inicializa com um valor padrão de data
+  });
   const [loading, setLoading] = useState(true);
 
   const schema = yup.object().shape({
@@ -35,22 +39,36 @@ const TransacaoForm: React.FC<TransacaoFormProps> = ({
       .positive("Deve ser um valor positivo!")
       .required("Por favor, insira um valor!")
       .min(1, "O valor tem que ser maior ou igual a 1!"),
-    date: yup.date().required(),
+    date: yup.date().required("Por favor, insira uma data válida!"),
   });
 
-  const beforeSubmit = () => initialValue.current.date = new Date();
+  const beforeSubmit = () => {
+    initialValue.current.date = startDate; // Garante que a data correta seja enviada
+  };
 
   useEffect(() => {
+    // Espera até que o formulário não esteja em estado de "loading"
     setLoading(true);
-    !isEdit && !isView
-      ? ((initialValue.current = {
-          transactionType: "",
-          amount: "",
-          date: new Date(),
-        }),
-        setLoading(false))
-      : ((initialValue.current = formValues), setStartDate(initialValue.current.date), setLoading(false));
-  }, [isView, isEdit, formValues]);
+
+    if (!isEdit && !isView) {
+      // Caso não seja edição ou visualização, inicializa com valores padrão
+      initialValue.current = {
+        transactionType: "",
+        amount: "",
+        date: new Date(),
+      };
+      setStartDate(new Date()); // Garante que o startDate seja corretamente inicializado
+      setLoading(false);
+    } else {
+      // Caso seja edição ou visualização, usa os valores passados via formValues
+      initialValue.current = {
+        ...formValues,
+        date: formValues?.date ?? new Date(), // Se formValues não tiver 'date', usa a data atual
+      };
+      setStartDate(formValues?.date ?? new Date()); // Garante que a data seja atualizada
+      setLoading(false);
+    }
+  }, [isView, isEdit, formValues]); // Dependendo de formValues, isEdit ou isView, ele irá atualizar
 
   return (
     <>
@@ -146,7 +164,7 @@ const TransacaoForm: React.FC<TransacaoFormProps> = ({
                           disabled={isView}
                           onChange={(date: any) => {
                             setStartDate(date);
-                            values.date = date;
+                            values.date = date; // Atualiza o valor do formulário para a data selecionada
                           }}
                         />
                         {errors.date && touched.date && (

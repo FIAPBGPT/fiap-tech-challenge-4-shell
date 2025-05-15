@@ -1,7 +1,6 @@
 import styled from "styled-components";
 
 export const CardSaldo = styled.div`
-  display: grid;
   width: 100%;
   height: 402px;
   border-radius: 8px;
@@ -9,8 +8,6 @@ export const CardSaldo = styled.div`
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   margin: 0 auto;
   padding: 24px;
-  grid-template-columns: 60% 35%;
-  grid-template-rows: 45px auto;
   gap: 12px 100px;
 
   @media (max-width: 768px) {
@@ -42,7 +39,8 @@ export const TitleCard = styled.h2`
 
   @media (max-width: 576px) {
     font-size: ${(props) =>
-      props.theme.font_size?.fontsizesmall}; /* Ajuste adicional em telas pequenas */
+      props.theme.font_size
+        ?.fontsizesmall}; /* Ajuste adicional em telas pequenas */
   }
 `;
 
@@ -66,7 +64,6 @@ export const ContentContainer = styled.div`
 `;
 
 export const ContentBalanceContainer = styled.div`
-  width: 60%;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

@@ -3,10 +3,10 @@ import { Row } from "react-bootstrap";
 import styled from "styled-components";
 
 export const FloatButtonRow = styled(Row)`
-  position: sticky;
-  right: 16px;
-  bottom: 0px;
-  justify-content: end;
+  position: fixed;
+  bottom: 20px; /* distância do fundo da tela */
+  right: 20px; /* distância da direita da tela */
+  z-index: 1000; /* garante que fique acima de outros elementos */
 `;
 export const FloatButton = styled(Fab)`
   button {

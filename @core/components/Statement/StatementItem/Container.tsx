@@ -4,8 +4,8 @@ import styled from 'styled-components';
 import Container from 'react-bootstrap/Container';
 
 export default styled(Container)`
-  background: #FFFFFF;
-  min-width: 255px;
+  background: #ffffff;
+  // min-width: 255px;
   margin: 0px;
   padding: 0px;
 
@@ -23,7 +23,7 @@ export default styled(Container)`
   }
 
   .row .col:first-child {
-    border-bottom: 1px solid #47A138;
+    border-bottom: 1px solid #47a138;
     padding-bottom: 15px;
   }
 
@@ -36,7 +36,7 @@ export default styled(Container)`
   }
 
   .statement-item-date {
-    color: #8B8B8B;
+    color: #8b8b8b;
     text-align: right;
     font-size: 13px;
   }

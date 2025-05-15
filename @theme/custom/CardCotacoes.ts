@@ -2,7 +2,7 @@ import styled from "styled-components";
 
 export const CardCotacoesContainer = styled.div`
   width: 100%;
-  max-width: 380px;
+  max-width: 48.5%;
   height: auto;
   gap: 0px;
   border-radius: 8px;
@@ -13,12 +13,24 @@ export const CardCotacoesContainer = styled.div`
   overflow: hidden;
   box-sizing: border-box;
 
-  @media (max-width: 768px) {
-    max-width: 200px;
+  @media (min-width: 480px) {
+    max-width: 48%;
   }
 
-  @media (max-width: 480px) {
-    max-width: 160px;
+  @media (min-width: 576px) {
+    max-width: 100%;
+  }
+
+  @media (min-width: 768px) {
+    max-width: 100%;
+  }
+
+  @media (min-width: 992px) {
+    max-width: 100%;
+  }
+
+  @media (min-width: 1200px) {
+    max-width: 48.5%;
   }
 `;
 

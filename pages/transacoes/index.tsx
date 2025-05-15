@@ -15,6 +15,7 @@ import router from "next/router";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { returnUserData } from "@/store/user/action";
+import Head from "next/head";
 
 export const metadata: Metadata = {
   title: "Bytebank - Transações",
@@ -52,6 +53,14 @@ export default function RootLayout() {
 
   return (
     <>
+      <Head>
+        <title>Bytebank - Transações</title>
+        <meta
+          name="description"
+          content="Página de Transações do site Bytebank"
+        />
+        <link rel="icon" href="/icon.svg" type="image/svg" />
+      </Head>
       <TransactionsHeader
         name={user && user.username !== "" && user.username}
       />

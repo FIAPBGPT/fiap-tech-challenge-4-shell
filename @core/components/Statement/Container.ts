@@ -3,10 +3,10 @@
 import styled from 'styled-components';
 
 export default styled.section`
-  background-color: #FFFFFF;
+  background-color: #ffffff;
   padding: 30px;
   border-radius: 12px;
-  min-width: 315px;
+  // min-width: 315px;
 
   header {
     display: flex;
