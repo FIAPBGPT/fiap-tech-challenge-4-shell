@@ -25,7 +25,7 @@ export const PStrong = styled.p`
 `;
 
 export const LinkCustom = styled(Link)`
-  color: ${(props) => props.theme.themeColor.success};
+  color: ${(props) => props.theme.themeColor?.success};
 `;
 
 export const H1Bold = styled.h1`
