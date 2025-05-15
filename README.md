@@ -13,6 +13,8 @@ Esse projeto tem como objetivo a entrega do tech challenge Fiap fase 4.
 ![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript)
 ![React-Bootstrap](https://img.shields.io/badge/Bootstrap-2.10.5-green?style=flat&logo=bootstrap)
+![React-Query](https://img.shields.io/badge/React%20Query%205.75.5-purple?style=flat&logo=react)
+
 
 ---
 
@@ -66,3 +68,12 @@ yarn dev
 ### Documentos referência
 
 [Figma](https://www.figma.com/design/ns5TC3X5Xr8V7I3LYKg9KA/Projeto-Financeiro?node-id=503-4264)
+
+
+
+## Contributors
+
+[Cibele Santos](https://github.com/cibsantos)                                             | [Flávia Jaconis](https://github.com/flaJaconis)                                             |[Malu Pereira](https://github.com/malulupereiraa)                                                    | [Thiago Martins](https://github.com/thiagofm33)                                             | [Victor Dantas](https://github.com/victorx9999)
+------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------
+[<img src="https://github.com/cibsantos.png" width="90" />](https://github.com/cibsantos) | [<img src="https://github.com/flaJaconis.png" width="90" />](https://github.com/flaJaconis) | [<img src="https://github.com/malulupereiraa.png" width="90" />](https://github.com/malulupereiraa) | [<img src="https://github.com/thiagofm33.png" width="90" />](https://github.com/thiagofm33) | [<img src="https://github.com/victorx9999.png" width="90" />](https://github.com/victorx9999)
+RM359376                                                                                  | RM358799                                                                                    | RM358717                                                                                            | RM359578                                                                                    | RM359148
