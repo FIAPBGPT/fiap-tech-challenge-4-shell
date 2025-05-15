@@ -1,40 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
+# 📈 Tech challenge FIAP - Bytebank
+Este projeto é o **Shell** da aplicação, desenvolvido com [React](https://reactjs.org) e [Next.js](https://nextjs.org). Ele atua como a estrutura principal da interface, responsável por orquestrar e integrar os módulos (micro frontends) da aplicação.
 
-## Getting Started
+> 🔧 Inicializado com [`create-next-app`](https://nextjs.org/docs/pages/api-reference/create-next-app).
 
-First, run the development server:
+Esse projeto tem como objetivo a entrega do tech challenge Fiap fase 4. 
+
+---
+
+## 📦 Tecnologias Utilizadas
+
+![Next.js](https://img.shields.io/badge/Next.js-14.2.13-000?style=flat&logo=next.js)
+![React](https://img.shields.io/badge/React-18-61DAFB?style=flat&logo=react)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat&logo=typescript)
+![React-Bootstrap](https://img.shields.io/badge/Bootstrap-2.10.5-green?style=flat&logo=bootstrap)
+![React-Query](https://img.shields.io/badge/React%20Query%205.75.5-purple?style=flat&logo=react)
+
+
+---
+
+## 🚀 Como Iniciar o Projeto
+
+Clone o repositório:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/FIAPBGPT/fiap-tech-challenge-4-shell.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Instale as dependências
 
-[API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+### Usando npm
+npm install
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/pages/building-your-application/routing/api-routes) instead of React pages.
+### Yarn
+yarn
 
-This project uses [`next/font`](https://nextjs.org/docs/pages/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
-## Learn More
+### Inicie o servidor de desenvolvimento:
 
-To learn more about Next.js, take a look at the following resources:
+# npm
+npm run dev
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn-pages-router) - an interactive Next.js tutorial.
+### yarn
+yarn dev
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+### Acesse no navegador:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+👉 http://localhost:3001
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/pages/building-your-application/deploying) for more details.
+
+## 📁 Estrutura do Projeto
+
+```
+.
+├── pages/             # Rotas da aplicação
+│   └── api/auth       # Autenticação 
+│   └── fonts/         # Fonts usadas no projeto
+│   └── home/          # Página inicial
+│   └── transacoes/    # Página de transações
+├── @core/             # Responsável por arquivos reutilizaveis
+├── styles/            # Estilos globais e modulares
+├── @theme/            # Responsavél pelo thema da aplicação
+├── _tests_            # Testes unitários
+```
+
+### Documentos referência
+
+[Figma](https://www.figma.com/design/ns5TC3X5Xr8V7I3LYKg9KA/Projeto-Financeiro?node-id=503-4264)
+
+
+
+## Contributors
+
+[Cibele Santos](https://github.com/cibsantos)                                             | [Flávia Jaconis](https://github.com/flaJaconis)                                             |[Malu Pereira](https://github.com/malulupereiraa)                                                    | [Thiago Martins](https://github.com/thiagofm33)                                             | [Victor Dantas](https://github.com/victorx9999)
+------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------
+[<img src="https://github.com/cibsantos.png" width="90" />](https://github.com/cibsantos) | [<img src="https://github.com/flaJaconis.png" width="90" />](https://github.com/flaJaconis) | [<img src="https://github.com/malulupereiraa.png" width="90" />](https://github.com/malulupereiraa) | [<img src="https://github.com/thiagofm33.png" width="90" />](https://github.com/thiagofm33) | [<img src="https://github.com/victorx9999.png" width="90" />](https://github.com/victorx9999)
+RM359376                                                                                  | RM358799                                                                                    | RM358717                                                                                            | RM359578                                                                                    | RM359148
