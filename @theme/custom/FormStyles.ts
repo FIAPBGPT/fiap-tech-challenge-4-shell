@@ -12,11 +12,11 @@ export const FormCheckCustom = styled(Form.Check)`
     font-size: 13px;
   }
   .form-check-input {
-    border-color: ${(props) => props.theme.themeColor.success};
+    border-color: ${(props) => props.theme.themeColor?.success};
   }
   .form-check-input:checked {
-    background-color: ${(props) => props.theme.themeColor.success};
-    border-color: ${(props) => props.theme.themeColor.success};
+    background-color: ${(props) => props.theme.themeColor?.success};
+    border-color: ${(props) => props.theme.themeColor?.success};
   }
 `;
 
