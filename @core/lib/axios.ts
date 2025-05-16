@@ -8,6 +8,15 @@ if (!baseURL) {
   );
 }
 
+const isDev = process.env.NODE_ENV === "development";
+const isLocalhost = baseURL.startsWith("http://localhost");
+
+if (!baseURL.startsWith("https://") && !(isDev && isLocalhost)) {
+  throw new Error(
+    `Insecure baseURL detected: ${baseURL}. Use HTTPS in NEXT_PUBLIC_NEXTAUTH_URL.`
+  );
+}
+
 const defaultHeaders = { "Content-Type": "application/json" };
 
 /**

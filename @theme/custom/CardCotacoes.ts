@@ -13,6 +13,10 @@ export const CardCotacoesContainer = styled.div`
   overflow: hidden;
   box-sizing: border-box;
 
+  @media (max-width: 360px) {
+    max-width: 100%;
+  }
+
   @media (min-width: 480px) {
     max-width: 48%;
   }
