@@ -2,14 +2,13 @@ import styled from "styled-components";
 
 export const StyledMenu = styled.div`
   width: 100%;
-  max-width: 390px;
   height: 100%;
   display: flex;
   justify-content: center;
   background-color: ${(props) => props.theme.themeColor.white};
   border-radius: 8px;
-  margin-left: 8px;
-  margin-top: 15px;
+  /* margin-left: 8px;
+  margin-top: 15px; */
 
   a {
     color: ${(props) => props.theme.themeColor.primary};

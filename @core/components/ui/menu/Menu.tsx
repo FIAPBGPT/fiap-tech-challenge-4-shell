@@ -10,7 +10,7 @@ export default function Menu() {
     const { width } = useWindowSize();
 
     const FixedMenu = () => {
-        return (width > 360 && <AsideMenu pathname={pathname} />)
+        return (width > 360 && <div style={{padding: 10, width: "100%"}}><AsideMenu pathname={pathname} /></div>)
     }
 
     return <FixedMenu />
