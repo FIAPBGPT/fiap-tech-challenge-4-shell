@@ -5,7 +5,7 @@ import { Container } from "react-bootstrap";
 import AppRouterCacheProvider from "@mui/material-nextjs/v13-appRouter/appRouterV13";
 import StyledComponentsRegistry from "@/@core/lib/registry";
 import { StyledRoot } from "@/@theme/styledRoot";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import Loading from "./loading";
 import { wrapper } from "../store/store";
 import {
@@ -16,6 +16,17 @@ import {
 
 const App = ({ Component, pageProps: { session, ...pageProps } }: AppProps) => {
   const queryClient = new QueryClient();
+  useEffect(() => {
+    const isLocalhost = window.location.hostname === "localhost";
+    const isDev = process.env.NODE_ENV === "development";
+
+    if (!isLocalhost && !isDev && window.location.protocol !== "https:") {
+      window.location.href = window.location.href.replace(
+        "http://",
+        "https://"
+      );
+    }
+  }, []);
   return (
     <Container fluid style={{ overflow: "hidden" }}>
       <AppRouterCacheProvider>
