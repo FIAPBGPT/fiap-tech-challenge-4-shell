@@ -84,6 +84,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmitAction }) => {
                     onChange={handleChange}
                     isInvalid={touched.email && !!errors.email}
                     isValid={touched.email && !errors.email}
+                    data-testid="email-input"
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.email}
@@ -104,6 +105,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmitAction }) => {
                     onChange={handleChange}
                     isInvalid={touched.password && !!errors.password}
                     isValid={touched.password && !errors.password}
+                    data-testid="password-input"
                   />
                   <Form.Control.Feedback type="invalid">
                     {errors.password}

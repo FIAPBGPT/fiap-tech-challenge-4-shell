@@ -118,6 +118,7 @@ const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
                     value={values.name}
                     onChange={handleChange}
                     isValid={touched.name && !errors.name}
+                    data-testid='name-input'
                   />
                 </Form.Group>
               </Col>
@@ -134,6 +135,7 @@ const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
                     value={values.email}
                     onChange={handleChange}
                     isValid={touched.email && !errors.email}
+                    data-testid='email-input'
                   />
                 </Form.Group>
 
@@ -164,6 +166,7 @@ const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
                     value={values.password}
                     onChange={handleChange}
                     isValid={touched.password && !errors.password}
+                    data-testid='password-input'
                   />
                 </Form.Group>
                 {values.password && (
@@ -223,6 +226,7 @@ const CadastroForm: React.FC<CadastroFormProps> = ({ onSubmitAction }) => {
                     feedback={errors.terms}
                     feedbackType="invalid"
                     id="validationFormik0"
+                    data-testid='terms-checkbox'
                   />
                 </Form.Group>
               </Col>
